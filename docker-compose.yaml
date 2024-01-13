@@ -1,0 +1,32 @@
+version: "3.8"
+
+volumes:
+  postgres-data:
+  artifact-store:
+
+services:
+  mlflow-db:
+    image: postgres:13.3
+    container_name: mlflow-backend-store
+    env_file:
+      - .env  # Updated path to the consolidated .env file
+
+  mlflow-server:
+    image: local-mlflow-tracking-server
+    container_name: local-mlflow-tracking-server
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        MLFLOW_ARTIFACT_STORE: ${MLFLOW_ARTIFACT_STORE}  # Ensure this variable is defined in .env
+    ports:
+      - "${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}"  # Ensure this variable is defined in .env
+    depends_on:
+      - mlflow-db
+    env_file:
+      - .env  # Updated path to the consolidated .env file
+    volumes:
+      - ./:/app
+      - artifact-store:${MLFLOW_ARTIFACT_STORE}  # Ensure this variable is defined in .env
+    ipc: host
+    init: true
