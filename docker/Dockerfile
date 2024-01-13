@@ -48,3 +48,4 @@ RUN python3.10 -m venv "${VIRTUAL_ENV}" \
 
 # Set the command to run the server script
 CMD ["/run-server.sh"]
+$
